@@ -1,4 +1,4 @@
-# BTBatteryWatch
+# BT Battery Watch
 
 BTBatteryWatch is a lightweight program for monitoring the battery level of Bluetooth devices on your Windows computer. The program does not rely on third-party software or drivers, runs in the background, and displays the battery level of the Bluetooth device every 30 minutes. I created BTBatteryWatch because I have several wireless mice, and the official software from mouse manufacturers has become intrusive and heavy with continuous background startup. I liked the idea of having a lightweight software that gives me the essential information: an overview of how much battery my mice have left before running out.
 

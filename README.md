@@ -34,7 +34,7 @@ BT Battery Watch is a lightweight program for monitoring the battery level of Bl
 
 
 ## How to use:
-1. **Initial configuration**: You will receive a warning that the configuration file is missing, and a window will open to create the configuration file. In this window, you have a `Search` button to press, and the software will search for all Bluetooth devices already registered/connected to the system and list them in the appropriate section. Simply select the name of your Bluetooth device that you want to monitor the battery and press the `Apply` button. Once the `Apply` button is pressed, you can close the window and reopen the program.
+1. **Initial configuration**: You will receive a warning that the configuration file is missing, and a window will open to create the configuration file. In this window, you have a `Search` button to press, and the software will search for all Bluetooth devices already registered/connected to the system and list them in the appropriate section. Simply select the name of your Bluetooth device that you want to monitor the battery and press the `Apply` button. Once the `Apply` button is pressed, you can close the window and the program in background will reboot by it self.
 2. **Bluetooth battery monitoring**: Once configured, the program will start automatically and monitor the battery level of the specified Bluetooth device in the configuration file. Visual notifications will be displayed in the System Tray.
 3. **Settings and updates**: If you want to change the device/mouse to monitor, you can easily access the program settings via the menu in the System Tray. Additionally, the program automatically checks for available updates and notifies you when a new version is available.
 

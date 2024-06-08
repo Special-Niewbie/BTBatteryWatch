@@ -12,23 +12,23 @@ BT Battery Watch is a lightweight program for monitoring the battery level of Bl
 
 **Reference Pictures**:
 
-1.
+1. Icon System tray
 ![Icon System tray](src/IconinSystemtray.png)
 
 
-2.
+2. System Tray Menu
 ![Icon System tray Menu](src/IconSystemTrayMenu.png)
 
 
-3.
+3. Mouse Over
 ![Mouse Over](src/MouseOver.png)
 
 
-4.
+4. Settings
 ![Settings](src/Settings.png)
 
 
-5.
+5. Hotkeys WINDOWS+SPACE, pop-up windows will show up.
 ![Hotkeys](src/Windows+SpaceHotkeys.png)
 
 
@@ -45,7 +45,7 @@ BT Battery Watch is a lightweight program for monitoring the battery level of Bl
 4. The program will automatically start monitoring the battery level of the specified Bluetooth device.
 
 ## Important Note
-BTBatteryWatch, being a very lightweight program and not relying on third-party libraries or software, can detect the battery percentage of your device if the Windows operating system sees the battery level of your device by default in the Bluetooth & devices Settings section.
+BT Battery Watch, being a very lightweight program and not relying on third-party libraries or software, can detect the battery percentage of your device if the Windows operating system sees the battery level of your device by default in the Bluetooth & devices Settings section.
 
 
 ## Donation

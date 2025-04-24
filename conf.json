@@ -1,0 +1,28 @@
+﻿{
+  "devices": [
+    {
+      "device": "1",
+      "name": "",
+      "iconTheme": "",
+      "enabled": true
+    },
+    {
+      "device": "2",
+      "name": "",
+      "iconTheme": "",
+      "enabled": false
+    },
+    {
+      "device": "3",
+      "name": "",
+      "iconTheme": "",
+      "enabled": false
+    },
+    {
+      "device": "4",
+      "name": "",
+      "iconTheme": "",
+      "enabled": false
+    }
+  ]
+}

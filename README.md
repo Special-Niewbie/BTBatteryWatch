@@ -33,7 +33,7 @@ First of all, thank you all for your interest in **BT Battery Watch**! I’ve re
 
 2. **Screen Warning Message for the device that it's going below 20%** 
 
-   here the picture as reference:
+   *here the picture as reference*:
    ![Warning Message](src/WarningMessage.png)
 
 3. **Dynamic tray icon**  
@@ -42,14 +42,14 @@ First of all, thank you all for your interest in **BT Battery Watch**! I’ve re
 
 4. **Hover tooltip**  
 
-   - See “Device Name — XX%” when you hover over the tray icon.  
+   - See “Device Name: XX%” when you hover over the tray icon.  
 
 5. **On-demand pop-up**  
 
    - Press **WIN + SPACE** to show a disappearing notification with name and battery level. On Main Software will come out like that, to watch all the connected devices:
       ![MAin Bt Battery Watch](src/Win_Space.png)
 
-   - On all the restDevice 2, 3 and 4 will pop-up like that if pressed on System Trai icon:
+   - On all the restDevice 2, 3 and 4 will pop-up like that if pressed on System Tray icon:
 
      ![Hotkeys](src/Windows+SpaceHotkeys.png)
 
@@ -156,12 +156,8 @@ For devices 2, 3 and 4, the menu is similar but streamlined. Replace `%deviceNam
 3.
 ![Mouse Over](src/MouseOver.png)
 
-
 4.
 ![Settings](src/Settings.png)
-
-5.
-![Hotkeys](src/Windows+SpaceHotkeys.png)
 
 
 

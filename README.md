@@ -2,6 +2,15 @@
 
 ![BT Battery Watch](src/BT_BatteryWatch.png)
 
+> ⚠️ **Important Note about Browser/Antivirus Warnings**  
+> 
+> If your browser or antivirus flags **BT Battery Watch** as "unsafe," **do not worry** — this is a **false positive**.  
+> Browsers and antivirus software rely heavily on generic online databases without actually analyzing what a program does.  
+> Unfortunately, this often results in safe, small independent projects being incorrectly flagged.  
+> 
+> For more information or to discuss this topic, you can check the dedicated discussion here:  
+> [Issue #2 - BT Battery Watch False Positives](https://github.com/Special-Niewbie/BTBatteryWatch/issues/2)
+
 **BT Battery Watch** is a lightweight program for monitoring the battery level of Bluetooth devices on your Windows computer.  It does not rely on third-party software or drivers, runs silently in the background, and updates the battery level every 10 minutes.  
 Originally designed to replace bloated software from mouse manufacturers, BT Battery Watch focuses on being lightweight and effective.
 

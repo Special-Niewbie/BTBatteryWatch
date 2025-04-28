@@ -1,180 +1,193 @@
 # BT Battery Watch
 
-
-
 ![BT Battery Watch](src/BT_BatteryWatch.png)
 
+**BT Battery Watch** is a lightweight program for monitoring the battery level of Bluetooth devices on your Windows computer.  It does not rely on third-party software or drivers, runs silently in the background, and updates the battery level every 10 minutes.  
+Originally designed to replace bloated software from mouse manufacturers, BT Battery Watch focuses on being lightweight and effective.
 
-
-**BT Battery Watch** is a lightweight program for monitoring the battery level of Bluetooth devices on your Windows computer. The program does not rely on third-party software or drivers, runs in the background, and displays the battery level of the Bluetooth device every 30 minutes. I created **BT Battery Watch** because I have several wireless mice, and the official software from mouse manufacturers has become intrusive and heavy with continuous background startup. I liked the idea of having a lightweight software that gives me the essential information: an overview of how much battery my mice have left before running out.
+---
 
 ## 🙏 Thank You
 
-First of all, thank you all for your interest in **BT Battery Watch**! I’ve read every piece of feedback and, starting with version **2.0.0**, I’ve evolved this little tool into something more complete—while preserving its original lightweight nature. It now has its own identity, with a well-defined icon and a handful of powerful new features.
+Thank you all for your incredible support and feedback!  
+Starting from version **2.0.0**, BT Battery Watch has evolved with new powerful features—while remaining true to its lightweight roots.  
+We now have a full identity with a dedicated icon and more customizations.
 
 ---
 
 ## 🚀 What’s New
 
-- **Multi-device support**: Track up to **4** Bluetooth devices simultaneously.  
-  *(Windows must expose the device’s battery level by default under “Bluetooth & devices.”)*  
-- **Custom-icon sharing**: Drop and Upload here your own icon-packs into the `Custom_Icons/` folder and BT Battery Watch will detect them automatically. You can even contribute your packs via Git—just request a push! The message will come out from windows as below:
+- **Multi-device support**: Monitor up to **4 Bluetooth devices** at the same time.  
+
+- **Custom Icon Packs**:  
+  You can now **upload and share** your own custom icon sets!  
+  Simply upload your icon pack into the `Custom_Icons/` folder in the GitHub Project, and BT Battery Watch will automatically detect when a new pack is available online for download.  
+  If you prefer to keep your pack private, you can manually add your icon folder into `C:\Users\(Your USER Name)\AppData\Local\BTBatteryWatch\icons`.  
+  The program will then include your new Icon Pack in the selection menu inside `conf.exe`.
+  
+  Example notification when a new Custom Icon Pack is available online from the GitHub Project:
+  
   ![New Custom Icons](src/New_Custom_icon_Message.png)
-- **Revamped system-tray menu**: A brand-new, organized menu structure with clear labels and icons.  
+  
+- **Revamped System Tray Menu**:  
+  Organized, clean, and packed with quick-access features.
+
+- **New Menu Option**:  
+  `ON/OFF Show Only Icon Numbers` — Switch to a dynamic "Number-only" icon style created automatically by the program.  
+  Instead of battery icons, you will see dynamic colored numbers as icons, representing the battery percentage directly.
+
+  Example of the new "Number-only" icons:
+  
+  ![Show Only Icon Numbers Example](src/Only_Icon_Numbers.png)
 
 ---
 
 ## 🔋 Main Features
 
-1. **4-device monitoring Battery level**  
+1. **Battery Level Monitoring**  
+   - Monitor up to **4 devices**.
+   - Devices must be Bluetooth-paired (no USB receivers).
 
-   - Add up to four devices in `conf.exe`.  
-   - Each device must be paired via Bluetooth (not via a USB receiver).  
+2. **Low Battery Warning**  
+   - Visual notification when any device drops below **20%**.
+   - Example:
+     ![Warning Message](src/WarningMessage.png)
 
-2. **Screen Warning Message for the device that it's going below 20%** 
+3. **Dynamic System Tray Icons**  
+   - Automatically updates the tray icon to reflect the current battery percentage every 10 minutes.
 
-   *here the picture as reference*:
-   ![Warning Message](src/WarningMessage.png)
+4. **Hover Tooltips**  
+   - Displays "Device Name: XX%" when hovering over a tray icon.
 
-3. **Dynamic tray icon**  
+5. **Quick Pop-up Notifications**  
+   - Press **WIN + SPACE** to instantly show battery levels of all devices.
 
-   - Icon updates every 10 minutes to reflect current battery level.  
+   Example:
+   ![Main Window](src/Win_Space.png)
+   
+   Devices 2-4 have their own quick pop-up too:
+   ![Hotkeys](src/Windows+SpaceHotkeys.png)
 
-4. **Hover tooltip**  
+6. **Simple Settings Access**  
+   - Quickly open the settings window (`conf.exe`) from the tray menu.
 
-   - See “Device Name: XX%” when you hover over the tray icon.  
-
-5. **On-demand pop-up**  
-
-   - Press **WIN + SPACE** to show a disappearing notification with name and battery level. On Main Software will come out like that, to watch all the connected devices:
-      ![MAin Bt Battery Watch](src/Win_Space.png)
-
-   - On all the restDevice 2, 3 and 4 will pop-up like that if pressed on System Tray icon:
-
-     ![Hotkeys](src/Windows+SpaceHotkeys.png)
-
-     
-
-6. **Easy access settings**  
-
-   - Open “Settings” from the tray menu to change devices, update frequency, etc.  
-
-7. **Auto-update checks**  
-   - Notifies you when a new version is available and now download directly the exe installation (instead of to go manually to the site).  
+7. **Auto-Update System**  
+   - The program checks for new versions automatically and allows direct download of the installer.
 
 ---
 
-## 📁 Custom Icons Online Folder
+## 📁 Custom Icons and GitHub Community Sharing
 
-You can share and use custom icon-packs:
+You can now create, upload, and share your **Custom Icon Packs**!
 
-1. Clone or download the `Custom_Icons/` folder from the project site.  
-2. Create your own subfolder, e.g. "Custom_Icons/ControllerPS5_by_SteveJobs/""
-- **Use underscores** (`_`) instead of spaces in folder names.  
-3. Export your icons as a **single** `.ico` file (multi-icon, auto-scale) at **256×256** resolution if possible.  
-4. Name each file *.ico* exactly:  
-**BT1, BT3, BT5, BT10, BT15, BT20, BT25, BT30, BT35, BT40, BT45, BT50, BT55, BT60, BT65, BT70, BT75, BT80, BT85, BT90, BT95, BT100**
+**How it works:**
+1. Inside the project, you will find a `Custom_Icons/` folder.  
+2. Create a new subfolder for your icons (example: `Custom_Icons/ControllerPS5_by_SteveJobs/`).  
+   - **Use underscores** (`_`) instead of spaces in the folder names.
+3. Export your icons as a **single multi-icon `.ico` file** (recommended resolution: **256×256**, scalable).
+4. Follow the naming convention exactly:
+   - **BT1, BT3, BT5, BT10, BT15, BT20, BT25, BT30, BT35, BT40, BT45, BT50, BT55, BT60, BT65, BT70, BT75, BT80, BT85, BT90, BT95, BT100.ico**.
+5. **Do not include** the disconnected icon (`BTdisco.ico`) — it's built into the program.
 
-5. **Do not** include `BTdisco.ico` (the “disconnected” icon)—that one is built in.  
+When new Icon Packs are uploaded by the community on GitHub, the program **notifies you automatically**, inviting you to download them without needing to manually search!
 
-Once your pack is in place, choose it from the “New Custom Icons” menu in the System Tray.
-
----
-
-## 📋 Icon-Naming Guidelines
-
-| File name | Battery level |  
-|-----------|---------------|  
-| `BT1.ico` | 1 %           |  
-| `BT3.ico` | 3 %           |  
-| …         | …             |  
-| `BT100.ico` | 100 %       |  
-
-- All files must use the `.ico` extension.  
-- Resolution: **256 × 256** (multi-icon, auto-scale).  
-- Folder names must use underscores (`_`) instead of spaces example `PS5_Icons_by_SteveJobs`. Somenting like this:
-    ![Folders Icon Structure](src/Folders_Structures.png)
+Folder structure example:
+![Folders Icon Structure](src/Folders_Structures.png)
 
 ---
 
-## 🖱️ System-Tray Menu (Master Menu)
+## 📋 Icon Naming Guidelines
 
-Below is the new menu structure for **Device 1** (the “master” monitor). Each entry appears under the tray icon.
+| File name  | Battery Level |
+|------------|---------------|
+| `BT1.ico`  | 1%            |
+| `BT3.ico`  | 3%            |
+| ...        | ...           |
+| `BT100.ico`| 100%          |
 
-| Menu label                        | Description                                                      |
-|-----------------------------------|------------------------------------------------------------------|
-| **👉 >>> BT Battery Watch Menu <<<** | Title label for the main app                         |
-| ----------------------------------- |                                                                  |
-| **New Custom Icons**              | Opens the folder to add or update custom-icon packs               |
-| ----------------------------------- |                                                                  |
-| **Settings**                      | Opens the configuration window (`conf.exe`)                      |
-| ----------------------------------- |                                                                  |
-| **Reload**                        | Reloads the AHK script (applies any changes immediately)         |
-| ----------------------------------- |                                                                  |
-| **Project Site**                  | Opens the GitHub releases page                                   |
-| **Donate**                        | Opens the donation page (PayPal)                           |
-| **Show Version**                  | Displays current version number and changelog snippet            |
-| **Show All Battery Levels**       | Pops up a window listing all 4 devices and their current levels  |
-| ----------------------------------- |                                                                  |
-| **ON / OFF Battery Monitor ShortKeys** | WIN + SPACE hotkey to turn it on or off                  |
-| **ON / OFF Low Battery Warning**  | Enables or disables low-battery notifications in the middle of the screen when we are below of 20% of battery |
-| **Exit**                          | Closes the application                                           |
+- All icons must use `.ico` extension.
+- Suggested resolution: **256×256** (multi-icon for scaling).
+- Folder names: Use underscores `_` instead of spaces.
 
 ---
 
-## 📱 Device 2–4 Menus (Secondary “Incubators”)
+## 🖱️ System Tray Menus
 
-For devices 2, 3 and 4, the menu is similar but streamlined. Replace `%deviceName%` with the actual device friendly name.
+### ➤ Master Menu (Device 1)
 
-| Menu label                      | Description                                             |
-|---------------------------------|---------------------------------------------------------|
-| **👉 >>> Device 2 to 4 Menu <<<** | Title label from the second to fourth device |
-| ----------------------------------- |                                                         |
-| **Settings**                    | Open the configuration window (`conf.exe`)              |
-| ----------------------------------- |                                                         |
-| **Project Site**                | Opens the GitHub releases page                          |
-| **Donate**                      | Opens the donation page (PayPal)                  |
-| ----------------------------------- |                                                         |
-| **Show Battery Level**          | Display current battery level for this device with popup message |
-| ----------------------------------- |                                                         |
-| **ON / OFF Low Battery Warning**| Enables or disables low-battery notifications in the middle of the screen when we are below of 20% of battery |
-| **Exit**                        | Close the application                                   |
+| Menu Label                         | Description                                                              |
+|-------------------------------------|--------------------------------------------------------------------------|
+| 👉 >>> BT Battery Watch Menu <<<    | Title label for the main app                                             |
+| New Custom Icons                    | Opens the `Custom_Icons/` folder to add or update Icon Packs             |
+| Settings                            | Opens the configuration window (`conf.exe`)                              |
+| Reload                              | Reloads the program and applies new changes immediately                  |
+| Project Site                        | Opens the GitHub project page                                            |
+| Donate                              | Opens the donation page (PayPal, Ko-fi)                                  |
+| Show Version                        | Displays current program version and changelog                         |
+| Show All Battery Levels             | Shows a pop-up with all connected device battery levels                  |
+| **ON/OFF Battery Monitor ShortKeys**| Enable or disable the **WIN + SPACE** shortcut                           |
+| **ON/OFF Low Battery Warning**      | Enable or disable screen notifications below 20% battery                |
+| **ON/OFF Show Only Icon Numbers**   | Switch to Number-only icons for dynamic battery level representation     |
+| Exit                                | Close the application                                                   |
 
 ---
 
+### ➤ Secondary Devices Menus (Devices 2–4)
 
-## 
-**Reference Pictures**:
+| Menu Label                         | Description                                                              |
+|-------------------------------------|--------------------------------------------------------------------------|
+| 👉 >>> Device 2 to 4 Menu <<<       | Title label for the additional devices                                   |
+| Settings                            | Opens the configuration window (`conf.exe`)                              |
+| Project Site                        | Opens the GitHub project page                                            |
+| Donate                              | Opens the donation page (PayPal, Ko-fi)                                  |
+| **Show Battery Level**              | Shows a pop-up with current battery level for this device                |
+| **ON/OFF Low Battery Warning**      | Enable or disable screen notifications below 20% battery                |
+| **ON/OFF Show Only Icon Numbers**   | Switch to Number-only icons for dynamic battery level representation     |
+| Exit                                | Close the application                                                   |
 
-1.
-![Icon System tray](src/IconinSystemtray.png)
+---
 
-2.
-![Icon System tray Menu](src/IconSystemTrayMenu.png) ![Icon System tray Menu](src/IconSystemTrayMenu_Form_Device2.png)
+## 📷 Reference Pictures
 
+1. ![System Tray Icon](src/IconinSystemtray.png)
+2. ![System Tray Menu](src/IconSystemTrayMenu.png) ![Device 2 Tray Menu](src/IconSystemTrayMenu_Form_Device2.png)
+3. ![Mouse Hover Tooltip](src/MouseOver.png)
+4. ![Settings Window](src/Settings.png)
 
-3.
-![Mouse Over](src/MouseOver.png)
+---
 
-4.
-![Settings](src/Settings.png)
+## 🔧 How to Use
 
+1. **Initial Setup**  
+   - Open the tray icon menu and select **Settings**.  
+   - Press the **Search** button to find all paired Bluetooth devices.  
+   - Choose your device, select an Icon Pack, and press **Apply**.
 
+2. **Battery Monitoring**  
+   - After setup, the program will monitor the device's battery percentage in the System Tray.  
+   - Notifications and icon updates will occur automatically.
 
-## How to use:
-1. **Initial configuration**: You need to open the System Tray Menu on the Icon and select **Settings**. In this window, you have a `Search` button to press, and the software will search for all Bluetooth devices directly already registered/connected to the system and list them in the appropriate section. Simply select the name of your Bluetooth device that you want to monitor the battery, select the Icons Pack and press the `Apply` button. Once the `Apply` button is pressed, you can close the window.
-2. **Bluetooth battery monitoring**: Once configured, the program will start automatically and monitor the battery level of the specified Bluetooth device in the configuration file. Visual notifications will be displayed in the System Tray.
-3. **Settings and updates**: If you want to change the device/mouse/ hearphones/Keyboards to monitor, you can easily access the program settings via the menu in the System Tray. Additionally, the program automatically checks for available updates and notifies you when a new version is available you can directly download the exe installer without connecting to the project page.
+3. **Settings and Updates**  
+   - Easily change your devices and settings at any time from the tray menu.  
+   - Automatic update checks keep you up-to-date without manual intervention.
 
-## Installation and use:
-1. Download the latest version of the program from the [GitHub repository](https://github.com/Special-Niewbie/BTBatteryWatch/releases).
-2. Run the installer that I have prepared.
-3. Follow the instructions for the initial configuration.
-4. The program will automatically start monitoring the battery level of the specified Bluetooth device once you set it.
+---
 
-## Important Note
-BT Battery Watch, being a very lightweight program and not relying on third-party libraries or software, can detect the battery percentage of your device if the Windows operating system sees the battery level of your device by default in the Bluetooth & devices Settings section, wich means usually must be directly by Bluetooth the device without middle receiver.
+## 📦 Installation
 
+1. Download the latest release from the [GitHub repository](https://github.com/Special-Niewbie/BTBatteryWatch/releases).
+2. Run the installer.
+3. Follow the initial setup instructions.
+4. Enjoy battery monitoring for your Bluetooth devices!
+
+---
+
+## ⚡ Important Notes
+
+BT Battery Watch detects battery levels only if Windows natively shows the Bluetooth device's battery percentage (e.g., in **Bluetooth & devices** settings).  
+This typically requires direct Bluetooth pairing — **not via a USB receiver**.
+
+---
 
 ## Donation
 If you enjoy using this software and find it helpful and you have the possibility, please consider making a small donation to support the ongoing development of this and other projects. Your generosity is greatly appreciated!

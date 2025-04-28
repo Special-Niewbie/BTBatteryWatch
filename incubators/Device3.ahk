@@ -16,28 +16,27 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#Persistent
 #NoEnv
 #SingleInstance Force
 SendMode Input
 SetWorkingDir %A_ScriptDir%\..
-#Persistent
+#Include %A_ScriptDir%\..\libs\Gdip_All.ahk
 
-deviceNumber := 3  ; <-- variable for every DeviceX.ahk
+global deviceNumber := 3  ; <-- variable for every DeviceX.ahk
 stateFileBatteryWarningMessage := A_ScriptDir . "\LowBatterySettings_3"
+global connectionCheckStartTime := A_TickCount
+global deviceConnectionChecks := {}
+
+; Number Variables
+global showOnlyIconNumbers := 0
+global stateFileIconNumbers := A_ScriptDir . "\ShowNumbersState_3"
 
 settingsFile := A_WorkingDir . "\conf.json"
 FileEncoding, UTF-8
 FileRead, jsonText, %settingsFile%
 if (!jsonText) {
     MsgBox, 16, Error, Failed to read conf.json
-    ExitApp
-}
-
-; Then initialize device variable
-device := GetDeviceFromJSON(jsonText, deviceNumber)
-
-if (!IsObject(device) || !device.name || !device.iconTheme) {
-    MsgBox, 16, Error, Device data not found or incomplete for device %deviceNumber%
     ExitApp
 }
 
@@ -53,6 +52,14 @@ if (!ErrorLevel) {
 if (!FileExist(stateFileBatteryWarningMessage)) {
     IniWrite, 1, %stateFileBatteryWarningMessage%, BatteryWarning, Enabled
 }
+
+; If the file does not exist, create it with the default setting of 0 (disabled)
+if (!FileExist(stateFileIconNumbers))
+    FileAppend, 0, %stateFileIconNumbers%
+
+; Read the initial state from the file that deals with the numbered icons
+FileRead, showOnlyIconNumbers, %stateFileIconNumbers%
+showOnlyIconNumbers := Trim(showOnlyIconNumbers)
 
 ; Read initial state from RAW file
 IniRead, batteryWarningMessageToggleState, %stateFileBatteryWarningMessage%, BatteryWarning, Enabled, 1
@@ -82,6 +89,7 @@ if (!IsObject(device) || !device.name || !device.iconTheme) {
 }
 
 deviceName := device.name
+global monitoredDevice := device.name
 iconTheme := device.iconTheme
 iconThemePath := A_WorkingDir . "\icons\" . iconTheme
 
@@ -111,32 +119,87 @@ Menu, Tray, Add, Show Battery Level, ShowBatteryLevel
 Menu, Tray, Icon, Show Battery Level, % A_WorkingDir . "\asset\battery.ico"
 Menu, Tray, Add, , Separator
 Menu, Tray, Add, ON/OFF Low Battery Message Warning, ToggleBatteryWarning
+Menu, Tray, Add, ON/OFF Show Only Icon Numbers, ToggleIconNumbers
 Menu, Tray, Add, Exit, ExitApp
+
+; Initialize the device connection checks
+deviceConnectionChecks[deviceNumber] := {name: deviceName, lastCheck: 0, connected: false}
 
 ; Set timer for battery icon updates
 SetTimer, UpdateBatteryIcon, 600000  ; Check every 10 minutes
 SetTimer, InitialUpdate, -3000  ; Initial update after 3 seconds
 
+; Set timer for frequent connection checking (during the first 3 minutes)
+SetTimer, CheckPendingConnections, 30000  ; Check every 30 seconds
+
 UpdateTrayMenuIconBatteryWarningMessage()
+UpdateTrayMenuIconNumbers()
 
 
 UpdateBatteryIcon() {
-    global deviceName, deviceNumber, iconThemePath, iconDisconnectedPath 
-    
-    isConnected := IsDeviceConnected(deviceName, deviceNumber)
+    global monitoredDevice, iconThemePath, iconDisconnectedPath, deviceNumber
+    isConnected := IsDeviceConnected(monitoredDevice, deviceNumber)
     if (!isConnected) {
         Menu, Tray, Icon, %iconDisconnectedPath%\BTdisco.ico
-        Menu, Tray, Tip, %deviceName% - Not connected
+        Menu, Tray, Tip, %monitoredDevice% - Not connected
+        return
+    }
+    level := GetBatteryLevel(monitoredDevice, deviceNumber)
+    iconFile := GetBatteryIconFile(level, iconThemePath)
+    
+    ; Check if we are using a direct HICON
+    if (SubStr(iconFile, 1, 6) = "HICON:") {
+        Menu, Tray, Icon, %iconFile%
+        
+        ; Important: destroy the icon AFTER it has been set
+        hIcon := SubStr(iconFile, 7)
+        SetTimer, DestroyIconTimer, -100  ; Destroy the icon after a short delay
+    }
+    else {
+        Menu, Tray, Icon, %iconFile%
+    }
+    
+    Menu, Tray, Tip, %monitoredDevice% - Battery: %level%`%
+}
+
+; Timer to safely destroy the icon
+DestroyIconTimer:
+    global lastIconHandle
+    if (lastIconHandle) {
+        DestroyIcon(lastIconHandle)
+        lastIconHandle := 0
+    }
+return
+
+CheckPendingConnections() {
+    global connectionCheckStartTime, deviceConnectionChecks, deviceNumber, deviceName
+    
+    ; Check if more than 3 minutes (180000 ms) have passed since startup
+    elapsedTime := A_TickCount - connectionCheckStartTime
+    if (elapsedTime > 180000) {
+        ; Disable this timer after 3 minutes
+        SetTimer, CheckPendingConnections, Off
         return
     }
     
-    level := GetBatteryLevel(deviceName, deviceNumber)
-    iconFile := GetBatteryIconFile(level, iconThemePath)
-    Menu, Tray, Icon, %iconFile%
-    Menu, Tray, Tip, %deviceName% - Battery: %level%`%
+    ; Check if our device is connected now
+    if (!deviceConnectionChecks[deviceNumber].connected) {
+        isConnected := IsDeviceConnected(deviceName, deviceNumber)
+        
+        if (isConnected) {
+            ; Device connected, update status
+            deviceConnectionChecks[deviceNumber].connected := true
+            UpdateBatteryIcon()  ; Update icon immediately
+            
+            ; If device is connected, we can disable the timer
+            SetTimer, CheckPendingConnections, Off
+        }
+    }
 }
 
 IsDeviceConnected(name, deviceNumber) {
+	global deviceConnectionChecks
+	
     ps1 := A_WorkingDir . "\Device" . deviceNumber . ".ps1"
     if (!FileExist(ps1)) {
         MsgBox, 16, Error, Missing Device%deviceNumber%.ps1
@@ -170,6 +233,11 @@ IsDeviceConnected(name, deviceNumber) {
 	
 	isConnected := (status = "Connected" || InStr(status, "Connected") > 0 && !InStr(status, "Disconnected"))
     
+    ; Update connection status in our tracking dictionary
+    if (deviceConnectionChecks.HasKey(deviceNumber)) {
+        deviceConnectionChecks[deviceNumber].connected := isConnected
+    }
+    
     return isConnected
 }
 
@@ -193,6 +261,42 @@ RunPowerShell(cmd, ByRef out) {
 }
 
 GetBatteryIconFile(level, themePath) {
+    global showOnlyIconNumbers, pToken
+    
+    ; Round the level
+    level := Round(level)
+    
+    ; Check for battery at 20% or less
+    if (level <= 20) {
+        global LowBatteryWarningShown, batteryWarningMessageToggleState
+        if (!LowBatteryWarningShown && batteryWarningMessageToggleState = "1") {
+            LowBatteryWarningShown := true
+            ShowLowBatteryWarning(level)
+            ; Set a timer to reset the warning after a certain period
+            SetTimer, ResetLowBatteryWarning, -1800000  ; 30 minutes
+        }
+    }
+    
+    ; If numeric mode is active, use number icons generated with GDI+
+    if (showOnlyIconNumbers = "1") {
+        ; Verify that GDI+ has been initialized
+        if (!pToken) {
+            if (!InitGDIPlus()) {
+                ; If GDI+ cannot be initialized, fallback to standard icon
+                return GetStandardBatteryIcon(level, themePath)
+            }
+        }
+        
+        ; Create an HICON and return it as "HICON:handle"
+        hIcon := CreateNumberIconHICON(level)
+        return "HICON:" . hIcon
+    } else {
+        ; Standard icon mode
+        return GetStandardBatteryIcon(level, themePath)
+    }
+}
+
+GetStandardBatteryIcon(level, themePath) {
     level := Round(level)
 	; Check if the battery is at 20% or less
     if (level <= 20) {
@@ -251,6 +355,75 @@ GetBatteryIconFile(level, themePath) {
     } else {
 		return themePath . "\BT1.ico"
     }
+}
+
+; Initialize GDI+ at program startup (add this where initialization happens)
+InitGDIPlus() {
+    global pToken
+    
+    ; Start GDI+
+    If !pToken := Gdip_Startup()
+    {
+        MsgBox, 48, GDI+ Error, GDI+ failed to start. Please ensure you have GDI+ installed.
+        return false
+    }
+    return true
+}
+
+; Create a numeric icon using GDI+
+CreateNumberIconHICON(percentage) {
+    ; Create a bitmap for the icon (32x32 pixels - standard size for ICO)
+    pBitmap := Gdip_CreateBitmap(32, 32, 0x00000000) ; PixelFormat32bppARGB (transparent background)
+    G := Gdip_GraphicsFromImage(pBitmap)
+    
+    ; Set high quality rendering
+    Gdip_SetSmoothingMode(G, 4)
+    Gdip_SetTextRenderingHint(G, 4)
+    
+    ; Create a larger font for the percentage text
+    hFamily := Gdip_FontFamilyCreate("Segoe UI")
+    
+    ; Adjust the font size based on the number of digits
+    fontSize := (percentage < 10) ? 22 : ((percentage < 100) ? 21 : 18)
+    hFont := Gdip_FontCreate(hFamily, fontSize, 1)
+    Gdip_DeleteFontFamily(hFamily)
+    
+    ; Format for centered alignment
+    hFormat := Gdip_StringFormatCreate(0x1)
+    Gdip_SetStringFormatAlign(hFormat, 1)
+    Gdip_SetStringFormatLineAlign(hFormat, 1)
+    
+    ; Determine text color based on percentage (gradient from green to red)
+    red := 255 - (percentage * 2.55)
+    green := percentage * 2.55
+    textColor := Format("0xFF{:02X}{:02X}FF", Round(red), Round(green))
+    
+    ; Create a brush for the text
+    pBrush := Gdip_BrushCreateSolid(textColor)
+    
+    ; Text to display the percentage
+    percentText := percentage
+    
+    ; Create a rectangle for text positioning
+    VarSetCapacity(RC, 16)
+    NumPut(0, RC, 0, "float"), NumPut(0, RC, 4, "float")
+    NumPut(32, RC, 8, "float"), NumPut(32, RC, 12, "float")
+    Gdip_DrawString(G, percentText, hFont, hFormat, pBrush, RC)
+    
+    ; Clean up resources
+    Gdip_DeleteBrush(pBrush)
+    Gdip_DeleteStringFormat(hFormat)
+    Gdip_DeleteFont(hFont)
+    
+    ; Create an HICON from the bitmap
+    hIcon := Gdip_CreateHICONFromBitmap(pBitmap)
+    
+    ; Clean up GDI+ resources
+    Gdip_DeleteGraphics(G)
+    Gdip_DisposeImage(pBitmap)
+    
+    ; Return the handle of the icon
+    return hIcon
 }
 
 ; Function to show low battery warning
@@ -383,6 +556,28 @@ UpdateTrayMenuIconBatteryWarningMessage() {
         Menu, Tray, Icon, ON/OFF Low Battery Message Warning, imageres.dll, 231  ; OFF icon
     }
 }
+
+UpdateTrayMenuIconNumbers() {
+    global showOnlyIconNumbers
+    
+    if (showOnlyIconNumbers = "1") {
+        Menu, Tray, Icon, ON/OFF Show Only Icon Numbers, imageres.dll, 229  ; ACTIVE icon
+    } else {
+        Menu, Tray, Icon, ON/OFF Show Only Icon Numbers, imageres.dll, 231  ; OFF icon
+    }
+}
+
+ToggleIconNumbers() {
+    global showOnlyIconNumbers, stateFileIconNumbers
+    showOnlyIconNumbers := (showOnlyIconNumbers = "1") ? "0" : "1"
+    FileDelete, %stateFileIconNumbers%
+    FileAppend, %showOnlyIconNumbers%, %stateFileIconNumbers%
+    UpdateTrayMenuIconNumbers()
+    
+    ; Force an immediate icon update to reflect the change
+    UpdateBatteryIcon()
+}
+
 
 TitleLabel:
 return

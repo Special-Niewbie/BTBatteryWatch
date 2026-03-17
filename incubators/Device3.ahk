@@ -24,6 +24,7 @@ SetWorkingDir %A_ScriptDir%\..
 #Include %A_ScriptDir%\..\libs\Gdip_All.ahk
 
 global deviceNumber := 3  ; <-- variable for every DeviceX.ahk
+lbtFile := A_ScriptDir . "\..\LBTMessageSet"
 stateFileBatteryWarningMessage := A_ScriptDir . "\LowBatterySettings_3"
 global connectionCheckStartTime := A_TickCount
 global deviceConnectionChecks := {}
@@ -266,14 +267,15 @@ GetBatteryIconFile(level, themePath) {
     ; Round the level
     level := Round(level)
     
-    ; Check for battery at 20% or less
-    if (level <= 20) {
+    ; Check for battery default 20%, personalizzabile via LBTMessageSet
+    lowBatteryThreshold := GetLowBatteryThreshold()
+    if (level <= lowBatteryThreshold) {
         global LowBatteryWarningShown, batteryWarningMessageToggleState
         if (!LowBatteryWarningShown && batteryWarningMessageToggleState = "1") {
             LowBatteryWarningShown := true
             ShowLowBatteryWarning(level)
-            ; Set a timer to reset the warning after a certain period
-            SetTimer, ResetLowBatteryWarning, -1800000  ; 30 minutes
+            ; Set a timer to reset the alert after a certain amount of time
+            SetTimer, ResetLowBatteryWarning, -1800000 ; 30 minutes
         }
     }
     
@@ -372,58 +374,124 @@ InitGDIPlus() {
 
 ; Create a numeric icon using GDI+
 CreateNumberIconHICON(percentage) {
-    ; Create a bitmap for the icon (32x32 pixels - standard size for ICO)
+    ; Create a bitmap for the icon (32x32 pixels - standard size for ICOs)
     pBitmap := Gdip_CreateBitmap(32, 32, 0x00000000) ; PixelFormat32bppARGB (transparent background)
     G := Gdip_GraphicsFromImage(pBitmap)
     
-    ; Set high quality rendering
+    ; Set rendering to high quality
     Gdip_SetSmoothingMode(G, 4)
     Gdip_SetTextRenderingHint(G, 4)
     
-    ; Create a larger font for the percentage text
+    ; Create the font family for the percentage text
     hFamily := Gdip_FontFamilyCreate("Segoe UI")
     
-    ; Adjust the font size based on the number of digits
-    fontSize := (percentage < 10) ? 22 : ((percentage < 100) ? 21 : 18)
-    hFont := Gdip_FontCreate(hFamily, fontSize, 1)
-    Gdip_DeleteFontFamily(hFamily)
-    
-    ; Format for centered alignment
-    hFormat := Gdip_StringFormatCreate(0x1)
-    Gdip_SetStringFormatAlign(hFormat, 1)
-    Gdip_SetStringFormatLineAlign(hFormat, 1)
-    
-    ; Determine text color based on percentage (gradient from green to red)
-    red := 255 - (percentage * 2.55)
+    ; Determine text color based on percentage (red to green gradient)
+    red   := 255 - (percentage * 2.55)
     green := percentage * 2.55
     textColor := Format("0xFF{:02X}{:02X}FF", Round(red), Round(green))
     
-    ; Create a brush for the text
+    ; Create text brushes
     pBrush := Gdip_BrushCreateSolid(textColor)
     
-    ; Text to display the percentage
-    percentText := percentage
+    ; === SPECIAL CASE: 100 written vertically (one digit per line) ===
+    if (percentage = 100) {
+        fontSize := 13
+        hFont := Gdip_FontCreate(hFamily, fontSize, 1)
+        
+        ; Format for horizontally and vertically centered alignment
+        hFormat := Gdip_StringFormatCreate(0x1)
+        Gdip_SetStringFormatAlign(hFormat, 1)
+        Gdip_SetStringFormatLineAlign(hFormat, 1)
+        
+        ; Draw "1", "0", "0" on three separate lines
+        digits    := ["1", "0", "0"]
+        yPositions := [0, 10, 20]  ; Y position for each digit in the 32x32 canvas
+        
+        Loop, 3 {
+            digit := digits[A_Index]
+            yPos  := yPositions[A_Index]
+            
+            VarSetCapacity(RC, 16)
+            NumPut(0,   RC,  0, "float")
+            NumPut(yPos, RC, 4, "float")
+            NumPut(32,  RC,  8, "float")
+            NumPut(12,  RC, 12, "float")  
+            Gdip_DrawString(G, digit, hFont, hFormat, pBrush, RC)
+        }
+        
+        ; Clean up case-specific resources 100
+        Gdip_DeleteStringFormat(hFormat)
+        Gdip_DeleteFont(hFont)
+        
+    ; === STANDARD CASE: all other numbers (1-99) horizontally ===
+    } else {
+        ; Adjust font size based on the number of digits
+        fontSize := (percentage < 10) ? 22 : 21
+        hFont := Gdip_FontCreate(hFamily, fontSize, 1)
+        
+        ; Format for centered alignment
+        hFormat := Gdip_StringFormatCreate(0x1)
+        Gdip_SetStringFormatAlign(hFormat, 1)
+        Gdip_SetStringFormatLineAlign(hFormat, 1)
+        
+        ; Percentage text
+        percentText := percentage
+        
+        ; Create rectangle for text placement (entire 32x32 canvas)
+        VarSetCapacity(RC, 16)
+        NumPut(0,  RC,  0, "float")
+        NumPut(0,  RC,  4, "float")
+        NumPut(32, RC,  8, "float")
+        NumPut(32, RC, 12, "float")
+        Gdip_DrawString(G, percentText, hFont, hFormat, pBrush, RC)
+        
+        ; Clean up standard case-specific resources
+        Gdip_DeleteStringFormat(hFormat)
+        Gdip_DeleteFont(hFont)
+    }
     
-    ; Create a rectangle for text positioning
-    VarSetCapacity(RC, 16)
-    NumPut(0, RC, 0, "float"), NumPut(0, RC, 4, "float")
-    NumPut(32, RC, 8, "float"), NumPut(32, RC, 12, "float")
-    Gdip_DrawString(G, percentText, hFont, hFormat, pBrush, RC)
-    
-    ; Clean up resources
+    ; Clean up common resources
+    Gdip_DeleteFontFamily(hFamily)
     Gdip_DeleteBrush(pBrush)
-    Gdip_DeleteStringFormat(hFormat)
-    Gdip_DeleteFont(hFont)
     
-    ; Create an HICON from the bitmap
+    ; Create HICON from bitmap
     hIcon := Gdip_CreateHICONFromBitmap(pBitmap)
     
     ; Clean up GDI+ resources
     Gdip_DeleteGraphics(G)
     Gdip_DisposeImage(pBitmap)
     
-    ; Return the handle of the icon
+    ; Return the icon handle
     return hIcon
+}
+
+; Reads the custom low battery warning threshold from the LBTMessageSet file.
+; If the file does not exist, is empty, contains letters, or a number out of range (1-99),
+; returns the default value of 20.
+GetLowBatteryThreshold() {
+    global lbtFile
+    ; If the file does not exist, use the default
+    if (!FileExist(lbtFile))
+        return 20
+    
+    FileRead, rawValue, %lbtFile%
+    rawValue := Trim(rawValue)
+    
+    ; If the content is empty, use the default
+    if (rawValue = "")
+        return 20
+    
+    ; Must be a positive integer only (digits only, no letters or symbols)
+    if !RegExMatch(rawValue, "^\d+$")
+        return 20
+    
+    threshold := rawValue + 0  ; convert to number
+    
+    ; Must be between 1 and 99 inclusive (100 makes no sense as a threshold)
+    if (threshold < 1 || threshold > 99)
+        return 20
+    
+    return threshold
 }
 
 ; Function to show low battery warning

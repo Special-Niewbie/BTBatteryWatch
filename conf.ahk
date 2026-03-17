@@ -24,6 +24,7 @@ SetBatchLines -1
 mainexe := A_ScriptDir . "\BTBatteryWatch.exe"
 jsonFile := A_ScriptDir . "\conf.json"
 iconsPath := A_ScriptDir . "\icons"
+lbtFile := A_ScriptDir . "\LBTMessageSet"
 
 if (!FileExist(mainexe)) {
     MsgBox, 16, Error, Missing Software files: `nPlease reinstall the software or if the problem persist contact the Developer.
@@ -80,6 +81,29 @@ Loop, 4 {
     Gui, Add, DropDownList, vTheme%idx% x%xPos% y490 w260,
     Gui, Add, Button, gDisable%idx% x%xPos% y525 w125 h30, Disable
     Gui, Add, Button, gApply%idx% x+5 y525 w125 h30, Apply
+}
+
+; --- Low Battery Warning Threshold ---
+Gui Font, s9, Segoe UI
+Gui Add, Text, x860 y600 w160 h20, Set the start warning `% message:
+; The list 1|2|3|...|99 with the current value preselected
+warningThresholdList := ""
+Loop, 99 {
+    warningThresholdList .= A_Index . "|"
+}
+warningThresholdList := RTrim(warningThresholdList, "|")
+Gui Add, DropDownList, vWarningThreshold x860 y622 w120 h200, %warningThresholdList%
+Gui Add, Button, gApplyWarningThreshold x990 y620 w80 h26, Apply
+
+; Preselects the current value from the LBTMessageSet file if it exists
+if (FileExist(lbtFile)) {
+    FileRead, currentThreshold, %lbtFile%
+    currentThreshold := Trim(currentThreshold)
+    if currentThreshold is integer
+    {
+        if (currentThreshold >= 1 && currentThreshold <= 99)
+            GuiControl, Choose, WarningThreshold, %currentThreshold%
+    }
 }
 
 Gui Show, w1100 h677, BT Battery Watch Settings
@@ -350,6 +374,21 @@ ParseCustomJSON(jsonContent) {
     return devices
 }
 
+ApplyWarningThreshold:
+    GuiControlGet, selectedThreshold,, WarningThreshold
+    if (selectedThreshold = "") {
+        MsgBox, 48, Warning, Please select a value from the dropdown.
+        Return
+    }
+    ; Write (or overwrite) the LBTMessageSet file with the chosen value
+    FileDelete, %lbtFile%
+    FileAppend, %selectedThreshold%, %lbtFile%
+    if (ErrorLevel) {
+        MsgBox, 16, Error, Failed to write LBTMessageSet file.
+        Return
+    }
+    MsgBox, 64, Success, Low battery warning threshold set to %selectedThreshold%`%.
+Return
 
 Cancel:
     ExitApp

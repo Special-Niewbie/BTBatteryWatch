@@ -911,10 +911,11 @@ InitialUpdate() {
 }
 
 
+#If (batteryToggleState = "1")
 #Space::
-if (batteryToggleState = "1")
     ShowAllBatteryLevels()
 return
+#If
 
 ; Start the timer immediately when the script starts
 UpdateBatteryIcon()
